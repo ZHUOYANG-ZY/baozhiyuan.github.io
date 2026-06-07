@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>志愿填报信息表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #f0f4f8;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .btn-group {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 8px;
+            transition: all 0.2s ease;
+        }
+        .btn-add {
+            background-color: #38a169;
+            color: white;
+        }
+        .btn-add:hover {
+            background-color: #2f855a;
+        }
+        .btn-delete {
+            background-color: #e53e3e;
+            color: white;
+        }
+        .btn-delete:hover {
+            background-color: #c53030;
+        }
+        .btn-clear {
+            background-color: #ed8936;
+            color: white;
+        }
+        .btn-clear:hover {
+            background-color: #dd6b20;
+        }
+        /* 新增 预览/打印按钮样式 */
+        .btn-preview {
+            background-color: #805ad5;
+            color: white;
+        }
+        .btn-preview:hover {
+            background-color: #6b46c1;
+        }
+        .btn-print {
+            background-color: #d69e2e;
+            color: white;
+        }
+        .btn-print:hover {
+            background-color: #b7791f;
+        }
+        /* 学校上移下移按钮样式 */
+        .btn-move {
+            padding: 6px 12px;
+            font-size: 14px;
+            margin: 0 4px;
+            background-color: #4299e1;
+            color: white;
+        }
+        .btn-move:hover {
+            background-color: #3182ce;
+        }
+        .btn-move:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+        /* 专业行移动按钮样式（小型） */
+        .pro-btn {
+            padding: 3px 6px;
+            font-size: 12px;
+            border: none;
+            border-radius: 3px;
+            background-color: #48bb78;
+            color: white;
+            cursor: pointer;
+            margin: 2px;
+        }
+        .pro-btn:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+        .school-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .card-header {
+            background-color: #2b6cb0;
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-header h3 {
+            font-size: 18px;
+        }
+        .button-container {
+            display: flex;
+            gap: 6px;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #333;
+        }
+        td {
+            border: 1px solid #333;
+            padding: 8px;
+            vertical-align: middle;
+            font-size: 16px;
+        }
+        /* 按图片比例设置列宽 */
+        td:nth-child(1) {
+            width: 12%;
+            text-align: center;
+        }
+        td:nth-child(2) {
+            width: 20%;
+        }
+        td:nth-child(3) {
+            width: 20%;
+            text-align: center;
+        }
+        td:nth-child(4) {
+            width: 48%;
+        }
+        /* 移除输入框所有横线（核心修改） */
+        input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            background: transparent;
+            padding: 4px 0;
+        }
+        input::placeholder {
+            color: #a0aec0;
+        }
+        /* 打印样式优化：彻底隐藏所有操作按钮 */
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            .btn-group, .button-container, .pro-btn {
+                display: none !important;
+            }
+            .school-card {
+                box-shadow: none;
+                border: none;
+                page-break-inside: avoid;
+            }
+            .card-header {
+                background-color: #f7fafc !important;
+                color: #2d3748 !important;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+        /* 隐藏模板 */
+        #schoolTemplate {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>志愿填报信息表</h1>
+    <div class="btn-group">
+        <button class="btn btn-add" onclick="addSchool()">+ 添加学校</button>
+        <button class="btn btn-clear" onclick="clearAllSchools()">清空所有</button>
+        <!-- 新增预览、导出打印按钮 -->
+        <button class="btn btn-preview" onclick="openPreview()">预览</button>
+        <button class="btn btn-print" onclick="exportPrint()">导出打印</button>
+    </div>
+
+    <div id="schoolList"></div>
+
+    <!-- 学校模板 -->
+    <div id="schoolTemplate" class="school-card">
+        <div class="card-header">
+            <h3 class="school-title">第 1 所学校</h3>
+            <div class="button-container">
+                <button class="btn btn-move" onclick="moveUp(this)">上移学校位置</button>
+                <button class="btn btn-move" onclick="moveDown(this)">下移学校位置</button>
+                <button class="btn btn-delete" onclick="deleteSchool(this)">删除学校</button>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <!-- 学校信息行 -->
+                <tr>
+                    <td>学校代码</td>
+                    <td><input type="text" placeholder="（可填写）"></td>
+                    <td>学校名称</td>
+                    <td><input type="text" placeholder="（可填写）"></td>
+                </tr>
+                <!-- 专业行 1-6 -->
+                <tr class="pro-row">
+                    <td>
+                        <button class="pro-btn" onclick="proUp(this)">上移专业</button>
+                        <button class="pro-btn" onclick="proDown(this)">下移专业</button>
+                    </td>
+                    <td><input type="text" placeholder="专业序号（可填写）"></td>
+                    <td colspan="2"><input type="text" placeholder="专业名字（可填写）"></td>
+                </tr>
+                <tr class="pro-row">
+                    <td>
+                        <button class="pro-btn" onclick="proUp(this)">上移专业</button>
+                        <button class="pro-btn" onclick="proDown(this)">下移专业</button>
+                    </td>
+                    <td><input type="text" placeholder="专业序号（可填写）"></td>
+                    <td colspan="2"><input type="text" placeholder="专业名字（可填写）"></td>
+                </tr>
+                <tr class="pro-row">
+                    <td>
+                        <button class="pro-btn" onclick="proUp(this)">上移专业</button>
+                        <button class="pro-btn" onclick="proDown(this)">下移专业</button>
+                    </td>
+                    <td><input type="text" placeholder="专业序号（可填写）"></td>
+                    <td colspan="2"><input type="text" placeholder="专业名字（可填写）"></td>
+                </tr>
+                <tr class="pro-row">
+                    <td>
+                        <button class="pro-btn" onclick="proUp(this)">上移专业</button>
+                        <button class="pro-btn" onclick="proDown(this)">下移专业</button>
+                    </td>
+                    <td><input type="text" placeholder="专业序号（可填写）"></td>
+                    <td colspan="2"><input type="text" placeholder="专业名字（可填写）"></td>
+                </tr>
+                <tr class="pro-row">
+                    <td>
+                        <button class="pro-btn" onclick="proUp(this)">上移专业</button>
+                        <button class="pro-btn" onclick="proDown(this)">下移专业</button>
+                    </td>
+                    <td><input type="text" placeholder="专业序号（可填写）"></td>
+                    <td colspan="2"><input type="text" placeholder="专业名字（可填写）"></td>
+                </tr>
+                <tr class="pro-row">
+                    <td>
+                        <button class="pro-btn" onclick="proUp(this)">上移专业</button>
+                        <button class="pro-btn" onclick="proDown(this)">下移专业</button>
+                    </td>
+                    <td><input type="text" placeholder="专业序号（可填写）"></td>
+                    <td colspan="2"><input type="text" placeholder="专业名字（可填写）"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let schoolCount = 0;
+
+        // 初始化
+        window.onload = function() {
+            addSchool();
+        }
+
+        // 添加学校
+        function addSchool() {
+            schoolCount++;
+            const template = document.getElementById('schoolTemplate');
+            const newSchool = template.cloneNode(true);
+            newSchool.style.display = 'block';
+            newSchool.id = '';
+            newSchool.querySelector('.school-title').textContent = `第 ${schoolCount} 所学校`;
+            document.getElementById('schoolList').appendChild(newSchool);
+            updateAllBtnStatus();
+        }
+
+        // 删除学校（仅删除当前，下方自动顺排）
+        function deleteSchool(btn) {
+            const card = btn.closest('.school-card');
+            card.remove();
+            updateSchoolNumbers(); // 自动重新排序所有学校序号
+            updateAllBtnStatus();
+        }
+
+        // 学校上移
+        function moveUp(btn) {
+            const card = btn.closest('.school-card');
+            const prevCard = card.previousElementSibling;
+            if (prevCard) {
+                card.parentNode.insertBefore(card, prevCard);
+                updateSchoolNumbers();
+                updateAllBtnStatus();
+            }
+        }
+
+        // 学校下移
+        function moveDown(btn) {
+            const card = btn.closest('.school-card');
+            const nextCard = card.nextElementSibling;
+            if (nextCard) {
+                card.parentNode.insertBefore(nextCard, card);
+                updateSchoolNumbers();
+                updateAllBtnStatus();
+            }
+        }
+
+        // 专业上移
+        function proUp(btn) {
+            const row = btn.closest('.pro-row');
+            const prevRow = row.previousElementSibling;
+            if (prevRow && prevRow.classList.contains('pro-row')) {
+                row.parentNode.insertBefore(row, prevRow);
+                updateAllBtnStatus();
+            }
+        }
+
+        // 专业下移
+        function proDown(btn) {
+            const row = btn.closest('.pro-row');
+            const nextRow = row.nextElementSibling;
+            if (nextRow && nextRow.classList.contains('pro-row')) {
+                row.parentNode.insertBefore(nextRow, row);
+                updateAllBtnStatus();
+            }
+        }
+
+        // 更新学校序号（删除后自动顺排）
+        function updateSchoolNumbers() {
+            const cards = document.querySelectorAll('.school-card');
+            schoolCount = cards.length;
+            cards.forEach((card, index) => {
+                card.querySelector('.school-title').textContent = `第 ${index + 1} 所学校`;
+            });
+        }
+
+        // 更新所有按钮禁用状态
+        function updateAllBtnStatus() {
+            const cards = document.querySelectorAll('.school-card');
+            cards.forEach((card, i) => {
+                const upBtn = card.querySelector('.button-container button:nth-child(1)');
+                const downBtn = card.querySelector('.button-container button:nth-child(2)');
+                upBtn.disabled = i === 0;
+                downBtn.disabled = i === cards.length - 1;
+            });
+
+            cards.forEach(card => {
+                const rows = card.querySelectorAll('.pro-row');
+                rows.forEach((row, j) => {
+                    const btns = row.querySelectorAll('.pro-btn');
+                    btns[0].disabled = j === 0;
+                    btns[1].disabled = j === rows.length - 1;
+                });
+            });
+        }
+
+        // 清空所有
+        function clearAllSchools() {
+            if (confirm('确定清空所有信息？')) {
+                document.getElementById('schoolList').innerHTML = '';
+                schoolCount = 0;
+                addSchool();
+            }
+        }
+
+        // 打开预览页面（无任何操作按钮）
+        function openPreview() {
+            const previewWindow = window.open('', '_blank', 'width=1000,height=800');
+            const content = document.getElementById('schoolList').cloneNode(true);
+            
+            // 移除预览页所有操作按钮
+            const buttons = content.querySelectorAll('.button-container, .pro-btn');
+            buttons.forEach(btn => btn.remove());
+            
+            previewWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="zh-CN">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>志愿填报预览</title>
+                    <style>
+                        *{font-family: "Microsoft YaHei", sans-serif;}
+                        body{padding:20px;max-width:1200px;margin:0 auto;}
+                        h1{text-align:center;margin-bottom:20px;}
+                        .school-card{margin-bottom:20px;}
+                        .card-header{padding:12px 16px;background:#f7fafc;display:flex;justify-content:space-between;align-items:center;}
+                        .table-wrapper{padding:16px;}
+                        table{width:100%;border-collapse:collapse;border:1px solid #333;}
+                        td{border:1px solid #333;padding:8px;font-size:16px;}
+                        input{width:100%;border:none;outline:none;background:transparent;}
+                        td:nth-child(1){width:12%;text-align:center;}
+                        td:nth-child(2){width:20%;}
+                        td:nth-child(3){width:20%;text-align:center;}
+                        td:nth-child(4){width:48%;}
+                    </style>
+                </head>
+                <body>
+                    <h1>志愿填报信息表</h1>
+                    ${content.innerHTML}
+                </body>
+                </html>
+            `);
+            previewWindow.document.close();
+        }
+
+        // 导出打印
+        function exportPrint() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
