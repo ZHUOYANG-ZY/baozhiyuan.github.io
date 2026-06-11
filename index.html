@@ -50,6 +50,10 @@
         .btn-print:hover { background-color: #2471a3; }
         .btn-export { background-color: #16a085; color: #fff; }
         .btn-export:hover { background-color: #138d75; }
+        /* 导出到微信按钮样式 */
+        .btn-wechat { background-color: #07C160; color: #fff; }
+        .btn-wechat:hover { background-color: #06b056; }
+
         .btn-add-school { background-color: #27ae60; color: #fff; width: 220px; padding: 14px 0; font-size: 17px; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.2s ease; }
         .btn-add-school:hover { background-color: #219653; }
         .btn-add-school:disabled { background-color: #bdc3c7; cursor: not-allowed; }
@@ -275,11 +279,12 @@
 <body>
     <h1>志愿填报信息表</h1>
     
-    <!-- 顶部按钮组 -->
+    <!-- 顶部按钮组：新增【导出到微信】按钮 -->
     <div class="btn-group">
         <button class="btn btn-clear" onclick="clearAllSchools()">清空所有</button>
         <button class="btn btn-print" onclick="exportPrint()">导出打印</button>
-        <button class="btn btn-export" onclick="exportAsWord()">导出 Word</button>
+        <button class="btn btn-export" onclick="exportAsWord()">导出Word</button>
+        <button class="btn btn-wechat" onclick="exportToWechat()">导出到微信</button>
     </div>
 
     <!-- 学校列表 -->
@@ -338,10 +343,169 @@
     <script>
         let schoolCount = 0;
         const MAX_SCHOOL = 36;
-        const MAX_MAJOR = 6; // 单校最多6个专业
+        const MAX_MAJOR = 6;     // 单校最多6个专业
+        const schoolsPerRow = 2; // Word每行2所学校
+        const schoolsPerPage = 4;// Word每页固定4所学校
 
         window.onload = () => addSchool();
 
+        // ===================== 通用：生成Word HTML与Blob（公共方法，复用） =====================
+        function generateWordBlob() {
+            const content = collectData();
+            let html = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+                <meta charset="utf-8">
+                <title>志愿填报信息表</title>
+                <style>
+                    @page WordSection1 {
+                        size: A4 landscape;
+                        margin: 2cm;
+                    }
+                    body { 
+                        font-family: "Microsoft YaHei"; 
+                        margin: 0;
+                        padding: 0;
+                        font-size: 14pt; /* 标准4号字体 */
+                        color: #333;
+                    }
+                    h1 { 
+                        text-align: center; 
+                        margin-bottom: 25px; 
+                        font-size: 14pt;
+                        font-weight: bold;
+                        color: #000;
+                    }
+                    .school-table {
+                        width: 100%;
+                        border: none;
+                        border-collapse: collapse;
+                        margin-bottom: 15px;
+                    }
+                    .school-cell {
+                        width: ${100/schoolsPerRow}%;
+                        vertical-align: top;
+                        padding: 12px;
+                        border: 1px solid #ddd;
+                    }
+                    .school-title {
+                        font-size: 14pt;
+                        font-weight: bold;
+                        margin-bottom: 8px;
+                        color: #222;
+                    }
+                    .info-line {
+                        margin: 6px 0;
+                        line-height: 1.5;
+                        display: block;
+                        font-size: 14pt;
+                    }
+                    .major-line {
+                        margin: 3px 0;
+                        line-height: 1.4;
+                        padding-left: 6px;
+                        font-size: 14pt;
+                    }
+                    .page-break {
+                        page-break-before: always;
+                        margin: 0;
+                        padding: 0;
+                        height: 0;
+                        border: none;
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>志愿填报信息表</h1>
+            `;
+
+            // 按页循环，强制每页4所学校
+            for (let pageNum = 0; pageNum < Math.ceil(content.length / schoolsPerPage); pageNum++) {
+                const pageStart = pageNum * schoolsPerPage;
+                const pageEnd = pageStart + schoolsPerPage;
+                const pageSchools = content.slice(pageStart, pageEnd);
+
+                if (pageNum > 0) {
+                    html += `<div class="page-break"></div>`;
+                }
+
+                for (let rowIdx = 0; rowIdx < pageSchools.length; rowIdx += schoolsPerRow) {
+                    const rowData = pageSchools.slice(rowIdx, rowIdx + schoolsPerRow);
+                    html += `<table class="school-table"><tr>`;
+
+                    rowData.forEach((school, idx) => {
+                        const globalIndex = pageStart + rowIdx + idx + 1;
+                        html += `
+                        <td class="school-cell">
+                            <div class="school-title">第${globalIndex}所学校</div>
+                            <div class="info-line">学校代码：${school.code || ''}</div>
+                            <div class="info-line">学校名称：${school.name || ''}</div>
+                            <div class="info-line">专业志愿：</div>
+                        `;
+                        school.majors.forEach((major, mIdx) => {
+                            html += `<div class="major-line">${mIdx + 1}. ${major.num || ''}　${major.name || ''}</div>`;
+                        });
+                        html += `</td>`;
+                    });
+
+                    const emptyCells = schoolsPerRow - rowData.length;
+                    for (let i = 0; i < emptyCells; i++) {
+                        html += `<td class="school-cell"></td>`;
+                    }
+                    html += `</tr></table>`;
+                }
+            }
+            
+            html += `</body></html>`;
+            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            return { blob, fileName: '志愿填报信息表.doc' };
+        }
+
+        // ===================== 判断是否为微信内置浏览器 =====================
+        function isWeChatBrowser() {
+            return navigator.userAgent.toLowerCase().indexOf('micromessenger') !== -1;
+        }
+
+        // ===================== 原有：导出Word文件 =====================
+        function exportAsWord() {
+            const res = generateWordBlob();
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(res.blob);
+            a.download = res.fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+        }
+
+        // ===================== 新增：导出到微信 =====================
+        function exportToWechat() {
+            const res = generateWordBlob();
+            const isWechat = isWeChatBrowser();
+
+            if (isWechat) {
+                // 微信内置浏览器：无法直接下载，引导手动操作
+                alert('⚠️ 微信内无法直接下载文件\n操作指引：\n1. 点击页面右上角「···」\n2. 选择「收藏/转发/在浏览器打开」\n3. 保存后即可发送到微信好友/文件助手');
+            } else {
+                // 普通浏览器（电脑/手机）：先下载，再指引发送微信
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(res.blob);
+                a.download = res.fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(a.href);
+
+                // 区分电脑/手机提示
+                if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+                    alert('✅ 文件已下载完成\n可在手机文件管理中找到文档，长按分享到微信');
+                } else {
+                    alert('✅ 文件已下载完成\n可直接将文件拖拽到微信聊天框发送');
+                }
+            }
+        }
+
+        // ===================== 下方原有功能代码（无修改） =====================
         // 添加学校
         function addSchool() {
             if(schoolCount >= MAX_SCHOOL) {
@@ -505,139 +669,6 @@
                 });
             });
             return schools;
-        }
-
-        // 通用下载方法
-        function downloadFile(blob, filename) {
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = filename;
-            a.click();
-            setTimeout(() => URL.revokeObjectURL(a.href), 100);
-        }
-
-        // ===================== Word导出【修复版：严格每页4校，强制分页】 =====================
-        function exportAsWord() {
-            const content = collectData();
-            const schoolsPerRow = 2;     // 每行横向2所
-            const schoolsPerPage = 4;    // 每页固定4所
-            let html = `
-            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-            <head>
-                <meta charset="utf-8">
-                <title>志愿填报信息表</title>
-                <style>
-                    @page WordSection1 {
-                        size: A4 landscape;
-                        margin: 2cm;
-                    }
-                    body { 
-                        font-family: "Microsoft YaHei"; 
-                        margin: 0;
-                        padding: 0;
-                        font-size: 14pt; /* 标准4号字体 */
-                        color: #333;
-                    }
-                    h1 { 
-                        text-align: center; 
-                        margin-bottom: 25px; 
-                        font-size: 14pt;
-                        font-weight: bold;
-                        color: #000;
-                    }
-                    .school-table {
-                        width: 100%;
-                        border: none;
-                        border-collapse: collapse;
-                        margin-bottom: 15px;
-                    }
-                    .school-cell {
-                        width: ${100/schoolsPerRow}%;
-                        vertical-align: top;
-                        padding: 12px;
-                        border: 1px solid #ddd;
-                    }
-                    .school-title {
-                        font-size: 14pt;
-                        font-weight: bold;
-                        margin-bottom: 8px;
-                        color: #222;
-                    }
-                    .info-line {
-                        margin: 6px 0;
-                        line-height: 1.5;
-                        display: block;
-                        font-size: 14pt;
-                    }
-                    .major-line {
-                        margin: 3px 0;
-                        line-height: 1.4;
-                        padding-left: 6px;
-                        font-size: 14pt;
-                    }
-                    /* 强制分页符样式 */
-                    .page-break {
-                        page-break-before: always;
-                        margin: 0;
-                        padding: 0;
-                        height: 0;
-                        border: none;
-                    }
-                </style>
-            </head>
-            <body>
-                <h1>志愿填报信息表</h1>
-            `;
-
-            // 按页循环，强制每页4所学校
-            for (let pageNum = 0; pageNum < Math.ceil(content.length / schoolsPerPage); pageNum++) {
-                // 计算当前页的学校索引范围
-                const pageStart = pageNum * schoolsPerPage;
-                const pageEnd = pageStart + schoolsPerPage;
-                const pageSchools = content.slice(pageStart, pageEnd);
-
-                // 不是第一页，先插入分页符
-                if (pageNum > 0) {
-                    html += `<div class="page-break"></div>`;
-                }
-
-                // 按行生成表格（每行2所）
-                for (let rowIdx = 0; rowIdx < pageSchools.length; rowIdx += schoolsPerRow) {
-                    const rowData = pageSchools.slice(rowIdx, rowIdx + schoolsPerRow);
-                    html += `<table class="school-table"><tr>`;
-
-                    // 渲染当前行的学校
-                    rowData.forEach((school, idx) => {
-                        const globalIndex = pageStart + rowIdx + idx + 1;
-                        html += `
-                        <td class="school-cell">
-                            <div class="school-title">第${globalIndex}所学校</div>
-                            <div class="info-line">学校代码：${school.code || ''}</div>
-                            <div class="info-line">学校名称：${school.name || ''}</div>
-                            <div class="info-line">专业志愿：</div>
-                        `;
-                        school.majors.forEach((major, mIdx) => {
-                            html += `<div class="major-line">${mIdx + 1}. ${major.num || ''}　${major.name || ''}</div>`;
-                        });
-                        html += `</td>`;
-                    });
-
-                    // 补空单元格，保证列数统一
-                    const emptyCells = schoolsPerRow - rowData.length;
-                    for (let i = 0; i < emptyCells; i++) {
-                        html += `<td class="school-cell"></td>`;
-                    }
-
-                    html += `</tr></table>`;
-                }
-            }
-            
-            html += `
-            </body>
-            </html>
-            `;
-            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-            downloadFile(blob, '志愿填报信息表.doc');
         }
     </script>
 </body>
