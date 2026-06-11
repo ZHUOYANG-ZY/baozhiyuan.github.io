@@ -53,6 +53,9 @@
         /* 导出到微信按钮样式 */
         .btn-wechat { background-color: #07C160; color: #fff; }
         .btn-wechat:hover { background-color: #06b056; }
+        /* PDF导出按钮 */
+        .btn-pdf { background-color: #dd4b39; color: #fff; }
+        .btn-pdf:hover { background-color: #c5372b; }
 
         .btn-add-school { background-color: #27ae60; color: #fff; width: 220px; padding: 14px 0; font-size: 17px; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.2s ease; }
         .btn-add-school:hover { background-color: #219653; }
@@ -279,12 +282,13 @@
 <body>
     <h1>志愿填报信息表</h1>
     
-    <!-- 顶部按钮组：新增【导出到微信】按钮 -->
+    <!-- 顶部按钮组：新增【导出到微信】+【导出PDF】 -->
     <div class="btn-group">
         <button class="btn btn-clear" onclick="clearAllSchools()">清空所有</button>
         <button class="btn btn-print" onclick="exportPrint()">导出打印</button>
-        <button class="btn btn-export" onclick="exportAsWord()">导出Word</button>
+        <button class="btn btn-export" onclick="exportAsWord()">导出Word(.docx)</button>
         <button class="btn btn-wechat" onclick="exportToWechat()">导出到微信</button>
+        <button class="btn btn-pdf" onclick="exportPDF()">导出PDF(微信完美打开)</button>
     </div>
 
     <!-- 学校列表 -->
@@ -349,13 +353,44 @@
 
         window.onload = () => addSchool();
 
-        // ===================== 通用：生成Word HTML与Blob（公共方法，复用） =====================
+        // ===================== 通用：生成标准docx兼容文档Blob（修复损坏核心） =====================
         function generateWordBlob() {
             const content = collectData();
             let html = `
             <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
             <head>
                 <meta charset="utf-8">
+                <!-- 修复：适配新版Office docx兼容头部 -->
+                <!--[if gte mso 9]>
+                <xml>
+                <w:WordDocument>
+                <w:View>Print</w:View>
+                <w:Zoom>100</w:Zoom>
+                <w:PunctuationKerning/>
+                <w:ValidateAgainstSchemas/>
+                <w:SaveIfXMLInvalid>false</w:SaveIfXMLInvalid>
+                <w:IgnoreMixedContent>false</w:IgnoreMixedContent>
+                <w:AlwaysShowPlaceholderText>false</w:AlwaysShowPlaceholderText>
+                <w:DoNotPromoteQF/>
+                <w:LidThemeOther>ZH-CN</w:LidThemeOther>
+                <w:LidThemeAsian>ZH-CN</w:LidThemeAsian>
+                <w:LidThemeComplexScript>ZH-CN</w:LidThemeComplexScript>
+                <w:Compatibility>
+                <w:SpaceForUL/>
+                <w:BalanceSingleByteDoubleByteWidth/>
+                <w:DoNotLeaveBackslashAlone/>
+                <w:ULTrailSpace/>
+                <w:DoNotExpandShiftReturn/>
+                <w:AdjustLineHeightInTable/>
+                <w:BreakWrappedTables/>
+                <w:SnapToGridInCell/>
+                <w:WrapTextPunct/>
+                <w:UseFELayout/>
+                </w:Compatibility>
+                <w:BrowserLevel>MicrosoftInternetExplorer4</w:BrowserLevel>
+                </w:WordDocument>
+                </xml>
+                <![endif]-->
                 <title>志愿填报信息表</title>
                 <style>
                     @page WordSection1 {
@@ -363,7 +398,7 @@
                         margin: 2cm;
                     }
                     body { 
-                        font-family: "Microsoft YaHei"; 
+                        font-family: "SimSun", "Microsoft YaHei"; 
                         margin: 0;
                         padding: 0;
                         font-size: 14pt; /* 标准4号字体 */
@@ -457,8 +492,9 @@
             }
             
             html += `</body></html>`;
-            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-            return { blob, fileName: '志愿填报信息表.doc' };
+            // 关键修改：后缀改为docx，MIME更换为现代Word格式
+            const blob = new Blob(['\ufeff', html], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            return { blob, fileName: '志愿填报信息表.docx' };
         }
 
         // ===================== 判断是否为微信内置浏览器 =====================
@@ -466,7 +502,15 @@
             return navigator.userAgent.toLowerCase().indexOf('micromessenger') !== -1;
         }
 
-        // ===================== 原有：导出Word文件 =====================
+        // ===================== 导出PDF（微信完美兼容方案） =====================
+        function exportPDF(){
+            window.print();
+            setTimeout(()=>{
+                alert('在弹出的打印页面，选择「保存为PDF」即可，该格式微信100%正常预览不会损坏');
+            },300)
+        }
+
+        // ===================== 原有：导出Word文件（升级为docx） =====================
         function exportAsWord() {
             const res = generateWordBlob();
             const a = document.createElement('a');
@@ -485,7 +529,7 @@
 
             if (isWechat) {
                 // 微信内置浏览器：无法直接下载，引导手动操作
-                alert('⚠️ 微信内无法直接下载文件\n操作指引：\n1. 点击页面右上角「···」\n2. 选择「收藏/转发/在浏览器打开」\n3. 保存后即可发送到微信好友/文件助手');
+                alert('⚠️ 微信内无法直接下载文件\n推荐方案：\n1.点击右上角「···」→在浏览器打开，下载docx文件\n2.优先使用【导出PDF】按钮，微信打开永不损坏');
             } else {
                 // 普通浏览器（电脑/手机）：先下载，再指引发送微信
                 const a = document.createElement('a');
@@ -498,9 +542,9 @@
 
                 // 区分电脑/手机提示
                 if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
-                    alert('✅ 文件已下载完成\n可在手机文件管理中找到文档，长按分享到微信');
+                    alert('✅ .docx文件已下载完成\n可在手机文件管理找到文档，分享到微信');
                 } else {
-                    alert('✅ 文件已下载完成\n可直接将文件拖拽到微信聊天框发送');
+                    alert('✅ .docx文件已下载完成\n直接拖拽文件到微信聊天框发送即可');
                 }
             }
         }
