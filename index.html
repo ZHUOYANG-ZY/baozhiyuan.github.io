@@ -57,7 +57,6 @@
 
         .btn-add-school { background-color: #27ae60; color: #fff; width: 220px; padding: 14px 0; font-size: 17px; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.2s ease; }
         .btn-add-school:hover { background-color: #219653; }
-        .btn-add-school:disabled { background-color: #bdc3c7; cursor: not-allowed; }
 
         /* 学校卡片样式 */
         .school-card {
@@ -129,72 +128,102 @@
         .btn-delete-school { color: #e74c3c; }
         .btn-move-school { color: #3498db; }
 
-        /* 服从调剂选项 */
-        .adjust-option {
-            margin-bottom: 16px;
-        }
-        .adjust-checkbox {
-            display: none;
-        }
-        .adjust-label {
-            background-color: #e8f4fd;
-            color: #3498db;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            display: inline-block;
-        }
-        .adjust-checkbox:checked + .adjust-label {
-            background-color: #3498db;
-            color: #fff;
-        }
-
-        /* 专业志愿区域 */
-        .major-section {
+        /* 专业组区域 */
+        .group-section {
             background-color: #f8f9fa;
             border-radius: 8px;
-            padding: 16px;
+            padding: 14px;
+            margin-bottom: 12px;
         }
-        .major-header {
+        .group-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
-        .major-title {
-            font-size: 18px;
+        .group-title {
+            font-size: 17px;
             font-weight: bold;
             color: #333;
             display: flex;
             align-items: center;
+            gap: 8px;
+        }
+        .group-code-input {
+            font-size: 15px;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+            width: 140px;
+        }
+        .group-actions {
+            display: flex;
             gap: 6px;
         }
-        .btn-add-major {
+        .group-action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background-color: #fff;
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease;
+        }
+        .group-action-btn:hover { background-color: #e8f4fd; }
+        .btn-delete-group { color: #e74c3c; }
+
+        .btn-add-group {
             background-color: #e8f4fd;
             color: #3498db;
             border: none;
             padding: 8px 16px;
             border-radius: 4px;
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            width: 100%;
+            margin-top: 8px;
             transition: background-color 0.2s ease;
         }
-        .btn-add-major:hover { background-color: #d0e8fb; }
+        .btn-add-group:hover { background-color: #d0e8fb; }
 
-        /* 专业卡片样式 */
+        /* 专业列表 */
+        .major-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .major-title {
+            font-size: 15px;
+            color: #555;
+        }
+        .btn-add-major {
+            background-color: #fff;
+            color: #3498db;
+            border: 1px solid #d0e8fb;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .btn-add-major:hover { background-color: #f0f8ff; }
+
         .major-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
         .major-card {
             background-color: #fff;
             border-radius: 6px;
-            padding: 12px;
+            padding: 10px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -202,13 +231,13 @@
         .major-index {
             background-color: #3498db;
             color: #fff;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             flex-shrink: 0;
         }
@@ -216,8 +245,8 @@
             flex: 1;
         }
         .major-name-input {
-            font-size: 20px;
-            font-weight: bold;
+            font-size: 16px;
+            font-weight: 500;
             color: #222;
             border: none;
             outline: none;
@@ -226,7 +255,7 @@
             margin-bottom: 2px;
         }
         .major-code-input {
-            font-size: 14px;
+            font-size: 13px;
             color: #888;
             border: none;
             outline: none;
@@ -235,16 +264,16 @@
         }
         .major-actions {
             display: flex;
-            gap: 6px;
+            gap: 5px;
         }
         .major-action-btn {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             border: none;
             background-color: #f0f2f5;
             color: #666;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -257,9 +286,9 @@
         /* 打印样式 */
         @media print {
             body { background: white; padding: 0; }
-            .btn-group, .add-school-wrapper, .school-actions, .major-actions, .btn-add-major, .adjust-option { display: none !important; }
+            .btn-group, .add-school-wrapper, .school-actions, .group-actions, .major-actions, .btn-add-major, .btn-add-group { display: none !important; }
             .school-card { box-shadow: none; border: 1px solid #eee; }
-            .major-section { background-color: #fff; }
+            .group-section { background-color: #fff; }
         }
 
         /* 手机端适配 */
@@ -271,8 +300,6 @@
             .btn-add-school { width: 100%; padding: 20px 0; font-size: 20px; }
             .school-name-input { font-size: 22px; }
             .school-code-input { font-size: 14px; }
-            .major-name-input { font-size: 18px; }
-            .major-code-input { font-size: 12px; }
         }
     </style>
 </head>
@@ -311,20 +338,29 @@
             </div>
         </div>
 
-        <!-- 服从调剂选项 -->
-        <div class="adjust-option">
-            <input type="checkbox" class="adjust-checkbox" id="adjust-{{id}}">
-            <label class="adjust-label" for="adjust-{{id}}">服从调剂</label>
-        </div>
+        <!-- 专业组列表容器 -->
+        <div class="group-list"></div>
+        <button class="btn-add-group" onclick="addMajorGroup(this)">+ 添加专业组</button>
+    </div>
 
-        <!-- 专业志愿区域 -->
-        <div class="major-section">
-            <div class="major-header">
-                <div class="major-title">📚 专业志愿 (<span class="major-count">0</span>)</div>
-                <button class="btn-add-major" onclick="addMajor(this)">+ 添加</button>
+    <!-- 专业组模板 -->
+    <div id="groupTemplate" class="group-section" style="display: none;">
+        <div class="group-header">
+            <div class="group-title">
+                <span class="group-index">专业组1</span>
+                <input type="text" class="group-code-input" placeholder="专业组代码">
             </div>
-            <div class="major-list"></div>
+            <div class="group-actions">
+                <button class="group-action-btn" onclick="moveGroupUp(this)">↑</button>
+                <button class="group-action-btn" onclick="moveGroupDown(this)">↓</button>
+                <button class="group-action-btn btn-delete-group" onclick="deleteGroup(this)">✕</button>
+            </div>
         </div>
+        <div class="major-header">
+            <div class="major-title">专业志愿</div>
+            <button class="btn-add-major" onclick="addMajor(this)">+ 添加专业</button>
+        </div>
+        <div class="major-list"></div>
     </div>
 
     <!-- 专业卡片模板 -->
@@ -335,20 +371,210 @@
             <input type="text" class="major-code-input" placeholder="专业代码">
         </div>
         <div class="major-actions">
-            <button class="major-action-btn btn-move-up" onclick="moveMajorUp(this)">↑</button>
-            <button class="major-action-btn btn-move-down" onclick="moveMajorDown(this)">↓</button>
+            <button class="major-action-btn" onclick="moveMajorUp(this)">↑</button>
+            <button class="major-action-btn" onclick="moveMajorDown(this)">↓</button>
             <button class="major-action-btn btn-delete-major" onclick="deleteMajor(this)">✕</button>
         </div>
     </div>
 
     <script>
         let schoolCount = 0;
-        const MAX_SCHOOL = 36;
-        const MAX_MAJOR = 6;
+        const MAX_MAJOR_PER_GROUP = 6; // 每个专业组最多6个专业
 
         window.onload = () => addSchool();
 
-        // ===================== 生成Word文档（修复跨页拆分+新页边距） =====================
+        // ===================== 学校操作 =====================
+        function addSchool() {
+            schoolCount++;
+            const template = document.getElementById('schoolTemplate');
+            const newSchool = template.cloneNode(true);
+            newSchool.style.display = 'block';
+            newSchool.id = '';
+            newSchool.querySelector('.school-index').textContent = schoolCount;
+
+            document.getElementById('schoolList').appendChild(newSchool);
+            // 默认添加1个专业组
+            addMajorGroup(newSchool.querySelector('.btn-add-group'));
+            updateAllSchoolIndexes();
+        }
+
+        function deleteSchool(btn) {
+            if(confirm('确定删除该学校？')) {
+                btn.closest('.school-card').remove();
+                updateAllSchoolIndexes();
+            }
+        }
+
+        function moveSchoolUp(btn) {
+            const currentCard = btn.closest('.school-card');
+            const prevCard = currentCard.previousElementSibling;
+            if (!prevCard) {
+                alert('已经是第一所学校，无法继续上移！');
+                return;
+            }
+            currentCard.parentNode.insertBefore(currentCard, prevCard);
+            updateAllSchoolIndexes();
+        }
+
+        function moveSchoolDown(btn) {
+            const currentCard = btn.closest('.school-card');
+            const nextCard = currentCard.nextElementSibling;
+            if (!nextCard) {
+                alert('已经是最后一所学校，无法继续下移！');
+                return;
+            }
+            currentCard.parentNode.insertBefore(nextCard, currentCard);
+            updateAllSchoolIndexes();
+        }
+
+        function updateAllSchoolIndexes() {
+            const schools = document.querySelectorAll('.school-card');
+            schoolCount = schools.length;
+            schools.forEach((school, i) => {
+                school.querySelector('.school-index').textContent = i + 1;
+                updateGroupIndexes(school);
+            });
+        }
+
+        // ===================== 专业组操作 =====================
+        function addMajorGroup(btn) {
+            const schoolCard = btn.closest('.school-card');
+            const groupList = schoolCard.querySelector('.group-list');
+            const template = document.getElementById('groupTemplate');
+            const newGroup = template.cloneNode(true);
+            newGroup.style.display = 'block';
+            newGroup.id = '';
+            groupList.appendChild(newGroup);
+            updateGroupIndexes(schoolCard);
+        }
+
+        function deleteGroup(btn) {
+            if(confirm('确定删除该专业组？')) {
+                const schoolCard = btn.closest('.school-card');
+                btn.closest('.group-section').remove();
+                updateGroupIndexes(schoolCard);
+            }
+        }
+
+        function moveGroupUp(btn) {
+            const group = btn.closest('.group-section');
+            const prev = group.previousElementSibling;
+            if(prev) {
+                group.parentNode.insertBefore(group, prev);
+                updateGroupIndexes(group.closest('.school-card'));
+            }
+        }
+
+        function moveGroupDown(btn) {
+            const group = btn.closest('.group-section');
+            const next = group.nextElementSibling;
+            if(next) {
+                group.parentNode.insertBefore(next, group);
+                updateGroupIndexes(group.closest('.school-card'));
+            }
+        }
+
+        function updateGroupIndexes(schoolCard) {
+            const groups = schoolCard.querySelectorAll('.group-section');
+            groups.forEach((group, i) => {
+                group.querySelector('.group-index').textContent = `专业组${i + 1}`;
+            });
+        }
+
+        // ===================== 专业操作 =====================
+        function addMajor(btn) {
+            const groupSection = btn.closest('.group-section');
+            const majorList = groupSection.querySelector('.major-list');
+            const currentNum = majorList.querySelectorAll('.major-card').length;
+
+            if (currentNum >= MAX_MAJOR_PER_GROUP) {
+                alert(`每个专业组最多添加 ${MAX_MAJOR_PER_GROUP} 个专业！`);
+                return;
+            }
+
+            const template = document.getElementById('majorTemplate');
+            const newMajor = template.cloneNode(true);
+            newMajor.style.display = 'flex';
+            newMajor.id = '';
+            majorList.appendChild(newMajor);
+            updateMajorIndexes(groupSection);
+        }
+
+        function deleteMajor(btn) {
+            if(confirm('确定删除该专业？')) {
+                const groupSection = btn.closest('.group-section');
+                btn.closest('.major-card').remove();
+                updateMajorIndexes(groupSection);
+            }
+        }
+
+        function moveMajorUp(btn) {
+            const majorCard = btn.closest('.major-card');
+            const prev = majorCard.previousElementSibling;
+            if(prev) {
+                majorCard.parentNode.insertBefore(majorCard, prev);
+                updateMajorIndexes(majorCard.closest('.group-section'));
+            }
+        }
+
+        function moveMajorDown(btn) {
+            const majorCard = btn.closest('.major-card');
+            const next = majorCard.nextElementSibling;
+            if(next) {
+                majorCard.parentNode.insertBefore(next, majorCard);
+                updateMajorIndexes(majorCard.closest('.group-section'));
+            }
+        }
+
+        function updateMajorIndexes(groupSection) {
+            const majorCards = groupSection.querySelectorAll('.major-card');
+            majorCards.forEach((major, i) => {
+                major.querySelector('.major-index').textContent = i + 1;
+            });
+        }
+
+        // ===================== 清空所有 =====================
+        function clearAllSchools() {
+            if(confirm('确定清空所有信息？')) {
+                document.getElementById('schoolList').innerHTML = '';
+                schoolCount = 0;
+                addSchool();
+            }
+        }
+
+        // 打印
+        function exportPrint() { window.print(); }
+
+        // ===================== 收集数据 =====================
+        function collectData() {
+            const schools = [];
+            document.querySelectorAll('.school-card').forEach(school => {
+                const schoolName = school.querySelector('.school-name-input').value.trim();
+                const schoolCode = school.querySelector('.school-code-input').value.trim();
+                const groups = [];
+
+                school.querySelectorAll('.group-section').forEach(group => {
+                    const groupCode = group.querySelector('.group-code-input').value.trim();
+                    const majors = [];
+                    group.querySelectorAll('.major-card').forEach(major => {
+                        majors.push({
+                            num: major.querySelector('.major-code-input').value.trim(),
+                            name: major.querySelector('.major-name-input').value.trim()
+                        });
+                    });
+                    groups.push({ code: groupCode, majors: majors });
+                });
+
+                schools.push({
+                    name: schoolName,
+                    code: schoolCode,
+                    groups: groups
+                });
+            });
+            return schools;
+        }
+
+        // ===================== 生成Word文档 =====================
         function generateWordBlob() {
             const content = collectData();
             let html = `
@@ -375,13 +601,13 @@
                 <style>
                     @page WordSection1 {
                         size: A4 landscape;
-                        margin: 1cm 3cm 1cm 3cm; /* 上1cm 右3cm 下1cm 左3cm */
+                        margin: 1cm 3cm 1cm 3cm; /* 上1 右3 下1 左3 */
                     }
                     body { 
                         font-family: SimSun, "宋体"; 
                         margin: 0;
                         padding: 0;
-                        font-size: 14pt; /* 4号字体 */
+                        font-size: 14pt;
                         color: #000;
                     }
                     .table-title {
@@ -409,9 +635,8 @@
                         background-color: #f5f5f5;
                     }
                     .cell-left { text-align: left; padding-left: 8px; }
-                    /* 核心：每个学校的两行作为整体，禁止分页拆分 */
                     .school-tbody {
-                        page-break-inside: avoid;
+                        page-break-inside: avoid; /* 整校不跨页拆分 */
                     }
                 </style>
             </head>
@@ -428,33 +653,56 @@
                     </thead>
             `;
 
-            // 每个学校用独立tbody包裹，保证不被分页拆分
+            // 遍历每个学校
             content.forEach((school, idx) => {
                 const globalIndex = idx + 1;
-                const majors = school.majors;
-                // 补全6个专业空位
-                while (majors.length < 6) {
-                    majors.push({ num: '', name: '' });
-                }
+                const groups = school.groups.length > 0 ? school.groups : [{ code: '', majors: [] }];
+                const totalRows = groups.length * 2; // 每个专业组占2行
 
-                html += `
-                <tbody class="school-tbody">
+                html += `<tbody class="school-tbody">`;
+
+                groups.forEach((group, gIdx) => {
+                    // 补全6个专业
+                    const majors = [...group.majors];
+                    while (majors.length < 6) {
+                        majors.push({ num: '', name: '' });
+                    }
+
+                    // 第一行：院校代码行（仅第一个专业组显示序号、院校名称）
+                    if (gIdx === 0) {
+                        html += `
+                        <tr>
+                            <td rowspan="${totalRows}">${globalIndex}</td>
+                            <td class="cell-left">院校代码：${school.code || ''}</td>
+                            <td rowspan="${totalRows}" class="cell-left">${school.name || ''}</td>
+                            <td class="cell-left">1. ${majors[0].num ? majors[0].num + ' ' : ''}${majors[0].name || ''}</td>
+                            <td class="cell-left">3. ${majors[2].num ? majors[2].num + ' ' : ''}${majors[2].name || ''}</td>
+                            <td class="cell-left">5. ${majors[4].num ? majors[4].num + ' ' : ''}${majors[4].name || ''}</td>
+                        </tr>
+                        `;
+                    } else {
+                        html += `
+                        <tr>
+                            <td class="cell-left">院校代码：${school.code || ''}</td>
+                            <td class="cell-left">1. ${majors[0].num ? majors[0].num + ' ' : ''}${majors[0].name || ''}</td>
+                            <td class="cell-left">3. ${majors[2].num ? majors[2].num + ' ' : ''}${majors[2].name || ''}</td>
+                            <td class="cell-left">5. ${majors[4].num ? majors[4].num + ' ' : ''}${majors[4].name || ''}</td>
+                        </tr>
+                        `;
+                    }
+
+                    // 第二行：专业组代码行
+                    html += `
                     <tr>
-                        <td rowspan="2">${globalIndex}</td>
-                        <td class="cell-left">院校代码：${school.code || ''}</td>
-                        <td rowspan="2" class="cell-left">${school.name || ''}</td>
-                        <td class="cell-left">1. ${majors[0].num ? majors[0].num + ' ' : ''}${majors[0].name || ''}</td>
-                        <td class="cell-left">3. ${majors[2].num ? majors[2].num + ' ' : ''}${majors[2].name || ''}</td>
-                        <td class="cell-left">5. ${majors[4].num ? majors[4].num + ' ' : ''}${majors[4].name || ''}</td>
-                    </tr>
-                    <tr>
-                        <td class="cell-left">专业组代码：</td>
+                        <td class="cell-left">专业组代码：${group.code || ''}</td>
                         <td class="cell-left">2. ${majors[1].num ? majors[1].num + ' ' : ''}${majors[1].name || ''}</td>
                         <td class="cell-left">4. ${majors[3].num ? majors[3].num + ' ' : ''}${majors[3].name || ''}</td>
                         <td class="cell-left">6. ${majors[5].num ? majors[5].num + ' ' : ''}${majors[5].name || ''}</td>
                     </tr>
-                </tbody>
-                `;
+                    `;
+                });
+
+                html += `</tbody>`;
             });
 
             html += `
@@ -466,12 +714,11 @@
             return { blob, fileName: '高考志愿填报表.docx' };
         }
 
-        // ===================== 判断微信环境 =====================
+        // ===================== 导出功能 =====================
         function isWeChatBrowser() {
             return navigator.userAgent.toLowerCase().indexOf('micromessenger') !== -1;
         }
 
-        // ===================== 导出PDF =====================
         function exportPDF(){
             window.print();
             setTimeout(()=>{
@@ -479,7 +726,6 @@
             },300)
         }
 
-        // ===================== 导出Word =====================
         function exportAsWord() {
             const res = generateWordBlob();
             const a = document.createElement('a');
@@ -491,7 +737,6 @@
             URL.revokeObjectURL(a.href);
         }
 
-        // ===================== 导出到微信 =====================
         function exportToWechat() {
             const res = generateWordBlob();
             const isWechat = isWeChatBrowser();
@@ -513,172 +758,6 @@
                     alert('✅ 文件已下载完成\n直接拖拽文件到微信聊天框即可发送');
                 }
             }
-        }
-
-        // ===================== 下方原有功能代码 =====================
-        // 添加学校
-        function addSchool() {
-            if(schoolCount >= MAX_SCHOOL) {
-                alert('最多只能添加 36 所学校！');
-                return;
-            }
-            schoolCount++;
-            const template = document.getElementById('schoolTemplate');
-            const newSchool = template.cloneNode(true);
-            newSchool.style.display = 'block';
-            newSchool.id = '';
-            
-            newSchool.querySelector('.school-index').textContent = schoolCount;
-            const adjustCheckbox = newSchool.querySelector('.adjust-checkbox');
-            const adjustLabel = newSchool.querySelector('.adjust-label');
-            const adjustId = `adjust-${schoolCount}`;
-            adjustCheckbox.id = adjustId;
-            adjustLabel.setAttribute('for', adjustId);
-
-            document.getElementById('schoolList').appendChild(newSchool);
-            updateAllIndexes();
-            updateAddBtnStatus();
-        }
-
-        // 删除学校
-        function deleteSchool(btn) {
-            if(confirm('确定删除该学校？')) {
-                btn.closest('.school-card').remove();
-                schoolCount--;
-                updateAllIndexes();
-                updateAddBtnStatus();
-            }
-        }
-
-        // 学校上移
-        function moveSchoolUp(btn) {
-            const currentCard = btn.closest('.school-card');
-            const prevCard = currentCard.previousElementSibling;
-            if (!prevCard) {
-                alert('已经是第一所学校，无法继续上移！');
-                return;
-            }
-            currentCard.parentNode.insertBefore(currentCard, prevCard);
-            updateAllIndexes();
-        }
-
-        // 学校下移
-        function moveSchoolDown(btn) {
-            const currentCard = btn.closest('.school-card');
-            const nextCard = currentCard.nextElementSibling;
-            if (!nextCard) {
-                alert('已经是最后一所学校，无法继续下移！');
-                return;
-            }
-            currentCard.parentNode.insertBefore(nextCard, currentCard);
-            updateAllIndexes();
-        }
-
-        // 添加专业（最多6个限制）
-        function addMajor(btn) {
-            const majorSection = btn.closest('.major-section');
-            const majorList = majorSection.querySelector('.major-list');
-            const currentMajorNum = majorList.querySelectorAll('.major-card').length;
-
-            if (currentMajorNum >= MAX_MAJOR) {
-                alert(`每个学校最多添加 ${MAX_MAJOR} 个专业！`);
-                return;
-            }
-
-            const template = document.getElementById('majorTemplate');
-            const newMajor = template.cloneNode(true);
-            newMajor.style.display = 'flex';
-            newMajor.id = '';
-            majorList.appendChild(newMajor);
-            updateMajorIndexes(majorSection);
-        }
-
-        // 删除专业
-        function deleteMajor(btn) {
-            if(confirm('确定删除该专业？')) {
-                const majorSection = btn.closest('.major-section');
-                btn.closest('.major-card').remove();
-                updateMajorIndexes(majorSection);
-            }
-        }
-
-        // 专业上移
-        function moveMajorUp(btn) {
-            const majorCard = btn.closest('.major-card');
-            const prev = majorCard.previousElementSibling;
-            if(prev) {
-                majorCard.parentNode.insertBefore(majorCard, prev);
-                updateMajorIndexes(majorCard.closest('.major-section'));
-            }
-        }
-
-        // 专业下移
-        function moveMajorDown(btn) {
-            const majorCard = btn.closest('.major-card');
-            const next = majorCard.nextElementSibling;
-            if(next) {
-                majorCard.parentNode.insertBefore(next, majorCard);
-                updateMajorIndexes(majorCard.closest('.major-section'));
-            }
-        }
-
-        // 更新所有学校序号
-        function updateAllIndexes() {
-            const schools = document.querySelectorAll('.school-card');
-            schoolCount = schools.length;
-            schools.forEach((school, i) => {
-                school.querySelector('.school-index').textContent = i + 1;
-                updateMajorIndexes(school.querySelector('.major-section'));
-            });
-        }
-
-        // 更新单个学校的专业序号和数量
-        function updateMajorIndexes(majorSection) {
-            const majorCards = majorSection.querySelectorAll('.major-card');
-            majorSection.querySelector('.major-count').textContent = majorCards.length;
-            majorCards.forEach((major, i) => {
-                major.querySelector('.major-index').textContent = i + 1;
-            });
-        }
-
-        // 更新添加学校按钮状态
-        function updateAddBtnStatus() {
-            const btn = document.getElementById('addSchoolBtn');
-            btn.disabled = schoolCount >= MAX_SCHOOL;
-        }
-
-        // 清空所有
-        function clearAllSchools() {
-            if(confirm('确定清空所有信息？')) {
-                document.getElementById('schoolList').innerHTML = '';
-                schoolCount = 0;
-                addSchool();
-            }
-        }
-
-        // 打印
-        function exportPrint() { window.print(); }
-
-        // 收集表单数据
-        function collectData() {
-            const schools = [];
-            document.querySelectorAll('.school-card').forEach(school => {
-                const schoolName = school.querySelector('.school-name-input').value.trim();
-                const schoolCode = school.querySelector('.school-code-input').value.trim();
-                const majors = [];
-                school.querySelectorAll('.major-card').forEach(major => {
-                    majors.push({
-                        num: major.querySelector('.major-code-input').value.trim(),
-                        name: major.querySelector('.major-name-input').value.trim()
-                    });
-                });
-                schools.push({
-                    name: schoolName,
-                    code: schoolCode,
-                    majors: majors
-                });
-            });
-            return schools;
         }
     </script>
 </body>
